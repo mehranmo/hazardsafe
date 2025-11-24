@@ -1,7 +1,7 @@
 {
-    "flow": {
-        "name": "HazardSAFE HITL Workflow",
-        "description": "Human-in-the-loop workflow: scenario -> compliance -> human approval -> provenance -> VC issuance -> output (approval) or rejection output.",
+    "name": "HazardSAFE HITL Workflow (Corrected)",
+    "description": "Human-in-the-loop workflow: scenario -> compliance -> human approval -> provenance -> VC issuance -> output (approval) or rejection output.",
+    "data": {
         "nodes": [
             {
                 "id": "node_1",
@@ -170,5 +170,6 @@
                 "target": "node_7"
             }
         ]
-    }
+    },
+    "is_component": false
 }

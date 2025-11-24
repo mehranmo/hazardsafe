@@ -13,135 +13,117 @@ FLOW_NAME = "HazardSAFE HITL Workflow"
 # Define the flow structure
 flow_data = {
     "name": FLOW_NAME,
-    "description": "Human-in-the-Loop workflow for HazMat compliance with Verifiable Credentials",
+    "description": "Human-in-the-Loop workflow: scenario -> compliance -> human approval -> provenance -> VC issuance -> output (approval) or rejection output.",
     "folder_name": "HazardSAFE",
-    "name": FLOW_NAME,
-    "description": "Human-in-the-Loop workflow for HazMat compliance with Verifiable Credentials",
     "data": {
         "nodes": [
             {
-                "id": "chat_input_scenario",
+                "id": "node_1",
+                "type": "ChatInput",
                 "data": {
-                    "type": "ChatInput",
-                    "node": {
-                        "template": {
-                            "input_value": {
-                                "type": "str",
-                                "value": '{"id": "SCN-DEMO-001", "material_class": "Class 7", "package_type": "Type B(U)", "ambient_temperature_c": 25.0, "transport_index": 0.5}'
-                            }
-                        },
-                        "description": "HazMat Scenario Input"
-                    }
+                    "label": "Scenario Input",
+                    "description": "Paste the JSON scenario here",
+                    "field_name": "scenario",
+                    "value": '{"id": "SCN-DEMO-001", "material_class": "Class 7", "package_type": "Type B(U)", "ambient_temperature_c": 25.0, "transport_index": 0.5}'
                 },
-                "position": {"x": 100, "y": 200}
+                "position": {"x": 0, "y": 0}
             },
             {
-                "id": "compliance_agent",
+                "id": "node_2",
+                "type": "ComplianceAgent",
                 "data": {
-                    "type": "ComplianceAgent",
-                    "node": {
-                        "description": "Checks compliance using RAG + Code-as-Policy"
-                    }
+                    "label": "Compliance Agent",
+                    "description": "Runs the HazardComplianceAgent on the scenario"
                 },
-                "position": {"x": 400, "y": 200}
+                "position": {"x": 250, "y": 0}
             },
             {
-                "id": "chat_input_hitl",
+                "id": "node_3",
+                "type": "ChatInput",
                 "data": {
-                    "type": "ChatInput",
-                    "node": {
-                        "template": {
-                            "input_value": {
-                                "type": "str",
-                                "value": "Type 'yes' to approve or 'no' to reject"
-                            }
-                        },
-                        "description": "🛑 HITL: Human Decision Point"
-                    }
+                    "label": "HITL Approval",
+                    "description": "Human approves (yes/no) the compliance result",
+                    "field_name": "approval",
+                    "value": ""
                 },
-                "position": {"x": 700, "y": 200}
+                "position": {"x": 500, "y": -100}
             },
             {
-                "id": "provenance_agent",
+                "id": "node_4",
+                "type": "Conditional",
                 "data": {
-                    "type": "ProvenanceAgent",
-                    "node": {
-                        "description": "Logs decision to immutable ledger"
-                    }
+                    "label": "Approval Check",
+                    "condition": "{{approval}} == 'yes'",
+                    "true_node": "node_5",
+                    "false_node": "node_9"
                 },
-                "position": {"x": 1000, "y": 200}
+                "position": {"x": 750, "y": -50}
             },
             {
-                "id": "report_agent",
+                "id": "node_5",
+                "type": "ProvenanceAgent",
                 "data": {
-                    "type": "ReportAgent",
-                    "node": {
-                        "description": "Issues Verifiable Credential if approved"
-                    }
+                    "label": "Provenance (Approved)",
+                    "description": "Logs the approved decision"
                 },
-                "position": {"x": 1300, "y": 200}
+                "position": {"x": 1000, "y": -100}
             },
             {
-                "id": "chat_output",
+                "id": "node_6",
+                "type": "ReportAgent",
                 "data": {
-                    "type": "ChatOutput",
-                    "node": {
-                        "description": "Final Result"
-                    }
+                    "label": "Report & VC Agent (Approved)",
+                    "description": "Issues a Verifiable Credential for the approved scenario"
                 },
-                "position": {"x": 1600, "y": 200}
+                "position": {"x": 1250, "y": -100}
+            },
+            {
+                "id": "node_8",
+                "type": "ChatOutput",
+                "data": {
+                    "label": "Final Output",
+                    "description": "Shows the VC or success message"
+                },
+                "position": {"x": 1500, "y": -100}
+            },
+            {
+                "id": "node_9",
+                "type": "ProvenanceAgent",
+                "data": {
+                    "label": "Provenance (Rejected)",
+                    "description": "Logs the rejected decision"
+                },
+                "position": {"x": 1000, "y": 100}
+            },
+            {
+                "id": "node_10",
+                "type": "ReportAgent",
+                "data": {
+                    "label": "Report & VC Agent (Rejected)",
+                    "description": "Issues a rejection report / VC for the denied scenario"
+                },
+                "position": {"x": 1250, "y": 100}
+            },
+            {
+                "id": "node_7",
+                "type": "ChatOutput",
+                "data": {
+                    "label": "Rejection Output",
+                    "description": "Shows why the scenario was rejected"
+                },
+                "position": {"x": 1500, "y": 100}
             }
         ],
         "edges": [
-            {
-                "id": "e1",
-                "source": "chat_input_scenario",
-                "target": "compliance_agent",
-                "sourceHandle": "output",
-                "targetHandle": "scenario"
-            },
-            {
-                "id": "e2",
-                "source": "compliance_agent",
-                "target": "chat_input_hitl",
-                "sourceHandle": "decision",
-                "targetHandle": "input"
-            },
-            {
-                "id": "e3",
-                "source": "chat_input_hitl",
-                "target": "provenance_agent",
-                "sourceHandle": "output",
-                "targetHandle": "decision"
-            },
-            {
-                "id": "e4",
-                "source": "compliance_agent",
-                "target": "provenance_agent",
-                "sourceHandle": "decision",
-                "targetHandle": "decision"
-            },
-            {
-                "id": "e5",
-                "source": "provenance_agent",
-                "target": "report_agent",
-                "sourceHandle": "event_log",
-                "targetHandle": "evidence_log"
-            },
-            {
-                "id": "e6",
-                "source": "compliance_agent",
-                "target": "report_agent",
-                "sourceHandle": "decision",
-                "targetHandle": "decision"
-            },
-            {
-                "id": "e7",
-                "source": "report_agent",
-                "target": "chat_output",
-                "sourceHandle": "vc",
-                "targetHandle": "input"
-            }
+            {"source": "node_1", "target": "node_2"},
+            {"source": "node_2", "target": "node_3"},
+            {"source": "node_3", "target": "node_4"},
+            {"source": "node_4", "target": "node_5", "condition": "true"},
+            {"source": "node_4", "target": "node_9", "condition": "false"},
+            {"source": "node_5", "target": "node_6"},
+            {"source": "node_6", "target": "node_8"},
+            {"source": "node_9", "target": "node_10"},
+            {"source": "node_10", "target": "node_7"}
         ]
     }
 }
