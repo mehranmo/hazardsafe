@@ -4,13 +4,19 @@
     "data": {
         "nodes": [
             {
-                "id": "node_1",
+                "id": "ChatInput-Scenario",
                 "type": "ChatInput",
                 "data": {
-                    "label": "Scenario Input",
-                    "description": "Paste the JSON scenario here",
-                    "field_name": "scenario",
-                    "value": "{\"id\": \"SCN-DEMO-001\", \"material_class\": \"Class 7\", \"package_type\": \"Type B(U)\", \"ambient_temperature_c\": 25.0, \"transport_index\": 0.5}"
+                    "type": "ChatInput",
+                    "node": {
+                        "template": {
+                            "input_value": {
+                                "type": "str",
+                                "value": "{\"id\": \"SCN-DEMO-001\", \"material_class\": \"Class 7\", \"package_type\": \"Type B(U)\", \"ambient_temperature_c\": 25.0, \"transport_index\": 0.5}"
+                            }
+                        },
+                        "description": "HazMat Scenario Input"
+                    }
                 },
                 "position": {
                     "x": 0,
@@ -18,158 +24,94 @@
                 }
             },
             {
-                "id": "node_2",
-                "type": "ComplianceAgent",
+                "id": "ComplianceAgent-Node",
+                "type": "CustomComponent",
                 "data": {
-                    "label": "Compliance Agent",
-                    "description": "Runs the HazardComplianceAgent on the scenario"
+                    "node": {
+                        "template": {
+                            "_type": "Component",
+                            "code": {
+                                "value": "from langflow.custom import CustomComponent\nfrom src.agents.compliance_agent import HazardComplianceAgent\n\nclass ComplianceAgentComponent(CustomComponent):\n    display_name = \"Hazard Compliance Agent\"\n    description = \"Checks a HazMat scenario against regulations.\"\n\n    def build_config(self):\n        return {\n            \"scenario\": {\"display_name\": \"Scenario JSON\", \"field_type\": \"dict\"},\n            \"model_name\": {\"display_name\": \"Model Name\", \"value\": \"gemini-2.0-flash-exp\"}\n        }\n\n    def build(self, scenario: dict, model_name: str = \"gemini-2.0-flash-exp\") -> dict:\n        agent = HazardComplianceAgent(model_name=model_name)\n        result = agent.check_scenario(scenario)\n        return result"
+                            }
+                        }
+                    }
                 },
                 "position": {
-                    "x": 250,
+                    "x": 300,
                     "y": 0
                 }
             },
             {
-                "id": "node_3",
+                "id": "ChatInput-HITL",
                 "type": "ChatInput",
                 "data": {
-                    "label": "HITL Approval",
-                    "description": "Human approves (yes/no) the compliance result",
-                    "field_name": "approval",
-                    "value": ""
+                    "type": "ChatInput",
+                    "node": {
+                        "template": {
+                            "input_value": {
+                                "type": "str",
+                                "value": "Type 'yes' to approve or 'no' to reject"
+                            }
+                        },
+                        "description": "HITL Approval"
+                    }
                 },
                 "position": {
-                    "x": 500,
-                    "y": -100
+                    "x": 600,
+                    "y": 0
                 }
             },
             {
-                "id": "node_4",
-                "type": "Conditional",
+                "id": "ProvenanceAgent-Node",
+                "type": "CustomComponent",
                 "data": {
-                    "label": "Approval Check",
-                    "condition": "{{approval}} == 'yes'",
-                    "true_node": "node_5",
-                    "false_node": "node_9"
+                    "node": {
+                        "template": {
+                            "_type": "Component",
+                            "code": {
+                                "value": "from langflow.custom import CustomComponent\nfrom src.agents.provenance_agent import HazardProvenanceAgent\n\nclass ProvenanceAgentComponent(CustomComponent):\n    display_name = \"Hazard Provenance Agent\"\n    description = \"Logs events to the immutable ledger.\"\n\n    def build_config(self):\n        return {\n            \"agent_id\": {\"display_name\": \"Source Agent ID\", \"field_type\": \"str\"},\n            \"event_type\": {\"display_name\": \"Event Type\", \"field_type\": \"str\"},\n            \"payload\": {\"display_name\": \"Event Payload\", \"field_type\": \"dict\"}\n        }\n\n    def build(self, agent_id: str, event_type: str, payload: dict) -> dict:\n        agent = HazardProvenanceAgent()\n        result = agent.log_event(event_type, agent_id, payload)\n        return result"
+                            }
+                        }
+                    }
                 },
                 "position": {
-                    "x": 750,
-                    "y": -50
+                    "x": 900,
+                    "y": 0
                 }
             },
             {
-                "id": "node_5",
-                "type": "ProvenanceAgent",
+                "id": "ReportAgent-Node",
+                "type": "CustomComponent",
                 "data": {
-                    "label": "Provenance (Approved)",
-                    "description": "Logs the approved decision"
+                    "node": {
+                        "template": {
+                            "_type": "Component",
+                            "code": {
+                                "value": "from langflow.custom import CustomComponent\nfrom src.agents.report_agent import ReportAgent\n\nclass ReportAgentComponent(CustomComponent):\n    display_name = \"Report & VC Agent\"\n    description = \"Issues a Verifiable Credential if compliant.\"\n\n    def build_config(self):\n        return {\n            \"scenario_id\": {\"display_name\": \"Scenario ID\", \"field_type\": \"str\"},\n            \"decision\": {\"display_name\": \"Compliance Decision\", \"field_type\": \"dict\"},\n            \"evidence_id\": {\"display_name\": \"Evidence ID\", \"field_type\": \"str\"}\n        }\n\n    def build(self, scenario_id: str, decision: dict, evidence_id: str) -> dict:\n        agent = ReportAgent()\n        vc = agent.issue_vc(scenario_id, decision, evidence_id)\n        return vc"
+                            }
+                        }
+                    }
                 },
                 "position": {
-                    "x": 1000,
-                    "y": -100
+                    "x": 1200,
+                    "y": 0
                 }
             },
             {
-                "id": "node_6",
-                "type": "ReportAgent",
-                "data": {
-                    "label": "Report & VC Agent (Approved)",
-                    "description": "Issues a Verifiable Credential for the approved scenario"
-                },
-                "position": {
-                    "x": 1250,
-                    "y": -100
-                }
-            },
-            {
-                "id": "node_8",
+                "id": "ChatOutput-Final",
                 "type": "ChatOutput",
                 "data": {
-                    "label": "Final Output",
-                    "description": "Shows the VC or success message"
+                    "type": "ChatOutput",
+                    "node": {
+                        "description": "Final VC Output"
+                    }
                 },
                 "position": {
                     "x": 1500,
-                    "y": -100
-                }
-            },
-            {
-                "id": "node_9",
-                "type": "ProvenanceAgent",
-                "data": {
-                    "label": "Provenance (Rejected)",
-                    "description": "Logs the rejected decision"
-                },
-                "position": {
-                    "x": 1000,
-                    "y": 100
-                }
-            },
-            {
-                "id": "node_10",
-                "type": "ReportAgent",
-                "data": {
-                    "label": "Report & VC Agent (Rejected)",
-                    "description": "Issues a rejection report / VC for the denied scenario"
-                },
-                "position": {
-                    "x": 1250,
-                    "y": 100
-                }
-            },
-            {
-                "id": "node_7",
-                "type": "ChatOutput",
-                "data": {
-                    "label": "Rejection Output",
-                    "description": "Shows why the scenario was rejected"
-                },
-                "position": {
-                    "x": 1500,
-                    "y": 100
+                    "y": 0
                 }
             }
         ],
-        "edges": [
-            {
-                "source": "node_1",
-                "target": "node_2"
-            },
-            {
-                "source": "node_2",
-                "target": "node_3"
-            },
-            {
-                "source": "node_3",
-                "target": "node_4"
-            },
-            {
-                "source": "node_4",
-                "target": "node_5",
-                "condition": "true"
-            },
-            {
-                "source": "node_4",
-                "target": "node_9",
-                "condition": "false"
-            },
-            {
-                "source": "node_5",
-                "target": "node_6"
-            },
-            {
-                "source": "node_6",
-                "target": "node_8"
-            },
-            {
-                "source": "node_9",
-                "target": "node_10"
-            },
-            {
-                "source": "node_10",
-                "target": "node_7"
-            }
-        ]
-    },
-    "is_component": false
+        "edges": []
+    }
 }
