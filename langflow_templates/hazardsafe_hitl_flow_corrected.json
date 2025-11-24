@@ -1,7 +1,7 @@
 {
     "flow": {
-        "name": "HazardSAFE HITL Workflow (Corrected)",
-        "description": "Human‑in‑the‑loop workflow: scenario → compliance check → human approval → provenance logging → VC issuance → output",
+        "name": "HazardSAFE HITL Workflow",
+        "description": "Human-in-the-loop workflow: scenario -> compliance -> human approval -> provenance -> VC issuance -> output (approval) or rejection output.",
         "nodes": [
             {
                 "id": "node_1",
@@ -36,7 +36,7 @@
                     "label": "HITL Approval",
                     "description": "Human approves (yes/no) the compliance result",
                     "field_name": "approval",
-                    "value": "yes"
+                    "value": ""
                 },
                 "position": {
                     "x": 500,
@@ -50,7 +50,7 @@
                     "label": "Approval Check",
                     "condition": "{{approval}} == 'yes'",
                     "true_node": "node_5",
-                    "false_node": "node_7"
+                    "false_node": "node_9"
                 },
                 "position": {
                     "x": 750,
@@ -61,7 +61,7 @@
                 "id": "node_5",
                 "type": "ProvenanceAgent",
                 "data": {
-                    "label": "Provenance Agent",
+                    "label": "Provenance (Approved)",
                     "description": "Logs the approved decision"
                 },
                 "position": {
@@ -73,24 +73,12 @@
                 "id": "node_6",
                 "type": "ReportAgent",
                 "data": {
-                    "label": "Report & VC Agent",
+                    "label": "Report & VC Agent (Approved)",
                     "description": "Issues a Verifiable Credential for the approved scenario"
                 },
                 "position": {
                     "x": 1250,
                     "y": -100
-                }
-            },
-            {
-                "id": "node_7",
-                "type": "ChatOutput",
-                "data": {
-                    "label": "Rejection Output",
-                    "description": "Shows why the scenario was rejected"
-                },
-                "position": {
-                    "x": 1000,
-                    "y": 100
                 }
             },
             {
@@ -103,6 +91,42 @@
                 "position": {
                     "x": 1500,
                     "y": -100
+                }
+            },
+            {
+                "id": "node_9",
+                "type": "ProvenanceAgent",
+                "data": {
+                    "label": "Provenance (Rejected)",
+                    "description": "Logs the rejected decision"
+                },
+                "position": {
+                    "x": 1000,
+                    "y": 100
+                }
+            },
+            {
+                "id": "node_10",
+                "type": "ReportAgent",
+                "data": {
+                    "label": "Report & VC Agent (Rejected)",
+                    "description": "Issues a rejection report / VC for the denied scenario"
+                },
+                "position": {
+                    "x": 1250,
+                    "y": 100
+                }
+            },
+            {
+                "id": "node_7",
+                "type": "ChatOutput",
+                "data": {
+                    "label": "Rejection Output",
+                    "description": "Shows why the scenario was rejected"
+                },
+                "position": {
+                    "x": 1500,
+                    "y": 100
                 }
             }
         ],
@@ -126,7 +150,7 @@
             },
             {
                 "source": "node_4",
-                "target": "node_7",
+                "target": "node_9",
                 "condition": "false"
             },
             {
@@ -136,6 +160,14 @@
             {
                 "source": "node_6",
                 "target": "node_8"
+            },
+            {
+                "source": "node_9",
+                "target": "node_10"
+            },
+            {
+                "source": "node_10",
+                "target": "node_7"
             }
         ]
     }
