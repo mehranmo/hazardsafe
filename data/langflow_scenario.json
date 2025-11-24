@@ -1,0 +1,7 @@
+{
+    "id": "SCN-DEMO-001",
+    "material_class": "Class 7",
+    "package_type": "Type B(U)",
+    "ambient_temperature_c": 25.0,
+    "transport_index": 0.5
+}

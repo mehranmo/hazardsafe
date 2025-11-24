@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "scenario_id": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["storage", "transport"] },
+        "hazard_class": { "type": "string" },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "temperature_c": { "type": "number" },
+            "pressure_bar": { "type": "number" },
+            "volume_l": { "type": "number" },
+            "duration_h": { "type": "number" }
+          }
+        }
+      },
+      "required": ["scenario_id", "type", "hazard_class", "parameters"]
+    },
+    "provenance_event": {
+      "type": "object",
+      "properties": {
+        "session_id": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "agent": { "type": "string" },
+        "activity": { "type": "string" },
+        "entity_ids": { "type": "array", "items": { "type": "string" } },
+        "data": { "type": "object" },
+        "integrity_hash": { "type": "string" },
+        "ai_card_id": { "type": "string" }
+      },
+      "required": ["session_id", "timestamp", "agent", "activity", "entity_ids", "data"]
+    },
+    "vc_certificate": {
+      "type": "object",
+      "properties": {
+        "@context": { "type": "array", "items": { "type": "string" } },
+        "id": { "type": "string" },
+        "type": { "type": "array", "items": { "type": "string" } },
+        "issuer": { "type": "string" },
+        "issuanceDate": { "type": "string", "format": "date-time" },
+        "credentialSubject": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "certificate_id": { "type": "string" },
+            "scenario_id": { "type": "string" },
+            "decision": { "type": "string", "enum": ["approve", "approve_with_conditions", "reject"] },
+            "evidence_root_id": { "type": "string" }
+          },
+          "required": ["id", "certificate_id", "scenario_id", "decision", "evidence_root_id"]
+        },
+        "proof": { "type": "object" }
+      },
+      "required": ["@context", "id", "type", "issuer", "issuanceDate", "credentialSubject"]
+    }
+  }
+}

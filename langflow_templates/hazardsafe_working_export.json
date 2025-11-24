@@ -1,0 +1,165 @@
+{
+    "name": "HazardSAFE HITL Workflow (2)",
+    "description": "Human-in-the-Loop workflow for HazMat compliance with Verifiable Credentials",
+    "icon": null,
+    "icon_bg_color": null,
+    "gradient": null,
+    "data": {
+        "nodes": [
+            {
+                "id": "chat_input_scenario",
+                "data": {
+                    "type": "ChatInput",
+                    "node": {
+                        "template": {
+                            "input_value": {
+                                "type": "str",
+                                "value": "{\"id\": \"SCN-DEMO-001\", \"material_class\": \"Class 7\", \"package_type\": \"Type B(U)\", \"ambient_temperature_c\": 25.0, \"transport_index\": 0.5}"
+                            }
+                        },
+                        "description": "HazMat Scenario Input"
+                    }
+                },
+                "position": {
+                    "x": 100,
+                    "y": 200
+                }
+            },
+            {
+                "id": "compliance_agent",
+                "data": {
+                    "type": "ComplianceAgent",
+                    "node": {
+                        "description": "Checks compliance using RAG + Code-as-Policy"
+                    }
+                },
+                "position": {
+                    "x": 400,
+                    "y": 200
+                }
+            },
+            {
+                "id": "chat_input_hitl",
+                "data": {
+                    "type": "ChatInput",
+                    "node": {
+                        "template": {
+                            "input_value": {
+                                "type": "str",
+                                "value": "Type 'yes' to approve or 'no' to reject"
+                            }
+                        },
+                        "description": "\ud83d\uded1 HITL: Human Decision Point"
+                    }
+                },
+                "position": {
+                    "x": 700,
+                    "y": 200
+                }
+            },
+            {
+                "id": "provenance_agent",
+                "data": {
+                    "type": "ProvenanceAgent",
+                    "node": {
+                        "description": "Logs decision to immutable ledger"
+                    }
+                },
+                "position": {
+                    "x": 1000,
+                    "y": 200
+                }
+            },
+            {
+                "id": "report_agent",
+                "data": {
+                    "type": "ReportAgent",
+                    "node": {
+                        "description": "Issues Verifiable Credential if approved"
+                    }
+                },
+                "position": {
+                    "x": 1300,
+                    "y": 200
+                }
+            },
+            {
+                "id": "chat_output",
+                "data": {
+                    "type": "ChatOutput",
+                    "node": {
+                        "description": "Final Result"
+                    }
+                },
+                "position": {
+                    "x": 1600,
+                    "y": 200
+                }
+            }
+        ],
+        "edges": [
+            {
+                "id": "e1",
+                "source": "chat_input_scenario",
+                "target": "compliance_agent",
+                "sourceHandle": "output",
+                "targetHandle": "scenario"
+            },
+            {
+                "id": "e2",
+                "source": "compliance_agent",
+                "target": "chat_input_hitl",
+                "sourceHandle": "decision",
+                "targetHandle": "input"
+            },
+            {
+                "id": "e3",
+                "source": "chat_input_hitl",
+                "target": "provenance_agent",
+                "sourceHandle": "output",
+                "targetHandle": "decision"
+            },
+            {
+                "id": "e4",
+                "source": "compliance_agent",
+                "target": "provenance_agent",
+                "sourceHandle": "decision",
+                "targetHandle": "decision"
+            },
+            {
+                "id": "e5",
+                "source": "provenance_agent",
+                "target": "report_agent",
+                "sourceHandle": "event_log",
+                "targetHandle": "evidence_log"
+            },
+            {
+                "id": "e6",
+                "source": "compliance_agent",
+                "target": "report_agent",
+                "sourceHandle": "decision",
+                "targetHandle": "decision"
+            },
+            {
+                "id": "e7",
+                "source": "report_agent",
+                "target": "chat_output",
+                "sourceHandle": "vc",
+                "targetHandle": "input"
+            }
+        ]
+    },
+    "is_component": false,
+    "updated_at": "2025-11-24T12:05:08+00:00",
+    "webhook": false,
+    "endpoint_name": null,
+    "tags": null,
+    "locked": false,
+    "mcp_enabled": false,
+    "action_name": null,
+    "action_description": null,
+    "access_type": "PRIVATE",
+    "id": "ed42ea7c-b6c5-4e6d-87b2-2882c1a6044c",
+    "user_id": "bdd7016f-f6a5-452e-b89f-aed1920eeb07",
+    "folder_id": "1c19e70b-b4fb-4e13-a04b-d6b285ac75f4"
+}

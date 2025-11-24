@@ -1,0 +1,8 @@
+google-generativeai
+chromadb
+pypdf
+python-jose[cryptography]
+python-dotenv
+google-cloud-firestore
+fpdf
+langflow

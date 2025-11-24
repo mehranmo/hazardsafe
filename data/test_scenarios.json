@@ -1,0 +1,62 @@
+[
+    {
+        "id": "SCN-001-PASS",
+        "name": "Safe Class 7 Transport - Low Temperature",
+        "material_class": "Class 7",
+        "package_type": "Type B(U)",
+        "ambient_temperature_c": 25.0,
+        "transport_index": 0.5,
+        "expected_result": "compliant",
+        "description": "Normal conditions, well within limits"
+    },
+    {
+        "id": "SCN-002-FAIL",
+        "name": "High Temperature Violation",
+        "material_class": "Class 7",
+        "package_type": "Type B(U)",
+        "ambient_temperature_c": 45.0,
+        "transport_index": 0.5,
+        "expected_result": "non-compliant",
+        "description": "Ambient temperature exceeds 38C limit"
+    },
+    {
+        "id": "SCN-003-EDGE",
+        "name": "Borderline Temperature",
+        "material_class": "Class 7",
+        "package_type": "Type B(U)",
+        "ambient_temperature_c": 38.0,
+        "transport_index": 0.5,
+        "expected_result": "compliant",
+        "description": "Exactly at the limit - should pass"
+    },
+    {
+        "id": "SCN-004-EDGE",
+        "name": "Just Over Limit",
+        "material_class": "Class 7",
+        "package_type": "Type B(U)",
+        "ambient_temperature_c": 38.5,
+        "transport_index": 0.5,
+        "expected_result": "non-compliant",
+        "description": "Slightly over the limit - should fail"
+    },
+    {
+        "id": "SCN-005-PASS",
+        "name": "Cold Storage Transport",
+        "material_class": "Class 7",
+        "package_type": "Type B(U)",
+        "ambient_temperature_c": 10.0,
+        "transport_index": 0.3,
+        "expected_result": "compliant",
+        "description": "Cold storage conditions"
+    },
+    {
+        "id": "SCN-006-PASS",
+        "name": "High Transport Index - Safe Temp",
+        "material_class": "Class 7",
+        "package_type": "Type B(U)",
+        "ambient_temperature_c": 30.0,
+        "transport_index": 2.5,
+        "expected_result": "compliant",
+        "description": "Higher TI but temperature is safe"
+    }
+]

@@ -1,0 +1,236 @@
+{
+  "provenance_events": [
+    {
+      "type": "COMPLIANCE_CHECK",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "decision": "Approved",
+        "reason": "Temp OK"
+      },
+      "signature_verified": true,
+      "timestamp": 1763978079,
+      "id": "evt_1763978079328"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": false,
+        "reason": "LLM Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash-exp\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash-exp\nPlease retry in 10.1410112s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_input_token_count\"\n  quota_id: \"GenerateContentInputTokensPerModelPerMinute-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash-exp\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n}\nviolations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash-exp\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n}\n, retry_delay {\n  seconds: 10\n}\n]"
+      },
+      "signature_verified": false,
+      "timestamp": 1763978449,
+      "id": "evt_1763978449873"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": true,
+        "reason": "Ambient temperature within limits",
+        "provenance": {
+          "agent_card": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJoYXphcmRzYWZlLWF1dGhvcml0eSIsInN1YiI6IkhhemFyZENvbXBsaWFuY2VBZ2VudCIsImlhdCI6MTc2Mzk3ODQ5MSwiZXhwIjoxNzY0MDY0ODkxLCJjYXJkIjp7Im5hbWUiOiJIYXphcmRDb21wbGlhbmNlQWdlbnQiLCJkZXNjcmlwdGlvbiI6IlZhbGlkYXRlcyBIYXpNYXQgdHJhbnNwb3J0IHNjZW5hcmlvcyBhZ2FpbnN0IHJlZ3VsYXRpb25zLiIsImNhcGFiaWxpdGllcyI6WyJDaGVja0hhem1hdFNjZW5hcmlvIl0sInZlcnNpb24iOiIxLjAuMCJ9fQ.HRHZg5Z9SEzxVYLuDF3ym4ZGIenjDbd5LTMshogSguI",
+          "rag_context": "Hazardous Materials Transport Regulations (Synthetic)\nSection 1: General Provisions\n1.1 Scope\nThese regulations apply to the transport of hazardous materials (HazMat) by road and rail.\n1.2 Classification\nMaterials are classified into 9 classes.\n*   **Class 1:** Explosives\n*   **Class 7:** Radioactive Materials\nSection 2: Specific Requirements for Class 7 (Radioactive)\n2.1 Ambient Conditions\n*   **Temperature:** For Type B(U) packages, the ambient temperature during transport must not\nexceed 38\u00b0C (100\u00b0F) unless the package allows for higher temperatures as specified in its\nCertificate of Compliance.\n*   **Pressure:** The containment system must retain integrity under a reduction of ambient pressure\nto 60 kPa (0.60 bar).\n2.2 Separation Distances\nPackages must be separated from occupied areas by at least:\n*   2 meters for Transport Index (TI) < 1.0\n*   4 meters for TI >= 1.0 and < 5.0\n2.3 Contamination Limits\nNon-fixed contamination on the external surfaces of any package shall not exceed:\n*   4 Bq/cm2 for beta and gamma emitters and low toxicity alpha emitters.\n*   0.4 Bq/cm2 for all other alpha emitters.\nSection 3: Emergency Response\n3.1 Leaking Packages\nIf a package is found to be leaking:\n1.  Isolate the area for at least 50 meters in all directions.\n2.  Notify the Radiation Safety Officer (RSO) immediately.\n3.  Do not touch the package without protective gear.\n3.2 Fire\nIn case of fire involving Class 7 materials:\n*   Use water spray to keep packages cool.\n*   Do not move damaged packages until assessed by an expert.",
+          "generated_code": "result = True\nreason = 'Ambient temperature within limits'"
+        }
+      },
+      "signature_verified": false,
+      "timestamp": 1763978497,
+      "id": "evt_1763978497000"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": true,
+        "reason": "Ambient temperature within limits",
+        "provenance": {
+          "agent_card": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJoYXphcmRzYWZlLWF1dGhvcml0eSIsInN1YiI6IkhhemFyZENvbXBsaWFuY2VBZ2VudCIsImlhdCI6MTc2Mzk3ODY5MywiZXhwIjoxNzY0MDY1MDkzLCJjYXJkIjp7Im5hbWUiOiJIYXphcmRDb21wbGlhbmNlQWdlbnQiLCJkZXNjcmlwdGlvbiI6IlZhbGlkYXRlcyBIYXpNYXQgdHJhbnNwb3J0IHNjZW5hcmlvcyBhZ2FpbnN0IHJlZ3VsYXRpb25zLiIsImNhcGFiaWxpdGllcyI6WyJDaGVja0hhem1hdFNjZW5hcmlvIl0sInZlcnNpb24iOiIxLjAuMCJ9fQ.D3qJ3joBoIK7EAXtHz9ZkJgbOExGDuiZESDmRWwPKEg",
+          "rag_context": "Hazardous Materials Transport Regulations (Synthetic)\nSection 1: General Provisions\n1.1 Scope\nThese regulations apply to the transport of hazardous materials (HazMat) by road and rail.\n1.2 Classification\nMaterials are classified into 9 classes.\n*   **Class 1:** Explosives\n*   **Class 7:** Radioactive Materials\nSection 2: Specific Requirements for Class 7 (Radioactive)\n2.1 Ambient Conditions\n*   **Temperature:** For Type B(U) packages, the ambient temperature during transport must not\nexceed 38\u00b0C (100\u00b0F) unless the package allows for higher temperatures as specified in its\nCertificate of Compliance.\n*   **Pressure:** The containment system must retain integrity under a reduction of ambient pressure\nto 60 kPa (0.60 bar).\n2.2 Separation Distances\nPackages must be separated from occupied areas by at least:\n*   2 meters for Transport Index (TI) < 1.0\n*   4 meters for TI >= 1.0 and < 5.0\n2.3 Contamination Limits\nNon-fixed contamination on the external surfaces of any package shall not exceed:\n*   4 Bq/cm2 for beta and gamma emitters and low toxicity alpha emitters.\n*   0.4 Bq/cm2 for all other alpha emitters.\nSection 3: Emergency Response\n3.1 Leaking Packages\nIf a package is found to be leaking:\n1.  Isolate the area for at least 50 meters in all directions.\n2.  Notify the Radiation Safety Officer (RSO) immediately.\n3.  Do not touch the package without protective gear.\n3.2 Fire\nIn case of fire involving Class 7 materials:\n*   Use water spray to keep packages cool.\n*   Do not move damaged packages until assessed by an expert.",
+          "generated_code": "result = True\nreason = 'Ambient temperature within limits'"
+        }
+      },
+      "signature_verified": false,
+      "timestamp": 1763978699,
+      "id": "evt_1763978699611"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": true,
+        "reason": "Ambient temperature within limits",
+        "provenance": {
+          "agent_card": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJoYXphcmRzYWZlLWF1dGhvcml0eSIsInN1YiI6IkhhemFyZENvbXBsaWFuY2VBZ2VudCIsImlhdCI6MTc2Mzk3ODc4MCwiZXhwIjoxNzY0MDY1MTgwLCJjYXJkIjp7Im5hbWUiOiJIYXphcmRDb21wbGlhbmNlQWdlbnQiLCJkZXNjcmlwdGlvbiI6IlZhbGlkYXRlcyBIYXpNYXQgdHJhbnNwb3J0IHNjZW5hcmlvcyBhZ2FpbnN0IHJlZ3VsYXRpb25zLiIsImNhcGFiaWxpdGllcyI6WyJDaGVja0hhem1hdFNjZW5hcmlvIl0sInZlcnNpb24iOiIxLjAuMCJ9fQ.c5vO4LwmUsbT-bgDOUsacrzxxqy5TzSNazuymAJ6YTY",
+          "rag_context": "Hazardous Materials Transport Regulations (Synthetic)\nSection 1: General Provisions\n1.1 Scope\nThese regulations apply to the transport of hazardous materials (HazMat) by road and rail.\n1.2 Classification\nMaterials are classified into 9 classes.\n*   **Class 1:** Explosives\n*   **Class 7:** Radioactive Materials\nSection 2: Specific Requirements for Class 7 (Radioactive)\n2.1 Ambient Conditions\n*   **Temperature:** For Type B(U) packages, the ambient temperature during transport must not\nexceed 38\u00b0C (100\u00b0F) unless the package allows for higher temperatures as specified in its\nCertificate of Compliance.\n*   **Pressure:** The containment system must retain integrity under a reduction of ambient pressure\nto 60 kPa (0.60 bar).\n2.2 Separation Distances\nPackages must be separated from occupied areas by at least:\n*   2 meters for Transport Index (TI) < 1.0\n*   4 meters for TI >= 1.0 and < 5.0\n2.3 Contamination Limits\nNon-fixed contamination on the external surfaces of any package shall not exceed:\n*   4 Bq/cm2 for beta and gamma emitters and low toxicity alpha emitters.\n*   0.4 Bq/cm2 for all other alpha emitters.\nSection 3: Emergency Response\n3.1 Leaking Packages\nIf a package is found to be leaking:\n1.  Isolate the area for at least 50 meters in all directions.\n2.  Notify the Radiation Safety Officer (RSO) immediately.\n3.  Do not touch the package without protective gear.\n3.2 Fire\nIn case of fire involving Class 7 materials:\n*   Use water spray to keep packages cool.\n*   Do not move damaged packages until assessed by an expert.",
+          "generated_code": "result = True\nreason = 'Ambient temperature within limits'"
+        }
+      },
+      "signature_verified": false,
+      "timestamp": 1763978786,
+      "id": "evt_1763978786363"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": true,
+        "reason": "Ambient temperature within limits",
+        "provenance": {
+          "agent_card": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJoYXphcmRzYWZlLWF1dGhvcml0eSIsInN1YiI6IkhhemFyZENvbXBsaWFuY2VBZ2VudCIsImlhdCI6MTc2Mzk3ODg2NywiZXhwIjoxNzY0MDY1MjY3LCJjYXJkIjp7Im5hbWUiOiJIYXphcmRDb21wbGlhbmNlQWdlbnQiLCJkZXNjcmlwdGlvbiI6IlZhbGlkYXRlcyBIYXpNYXQgdHJhbnNwb3J0IHNjZW5hcmlvcyBhZ2FpbnN0IHJlZ3VsYXRpb25zLiIsImNhcGFiaWxpdGllcyI6WyJDaGVja0hhem1hdFNjZW5hcmlvIl0sInZlcnNpb24iOiIxLjAuMCJ9fQ.aDYK9QTejDm82TJOYNUVTJiEt90ulQd9MPWh3QATBnc",
+          "rag_context": "Hazardous Materials Transport Regulations (Synthetic)\nSection 1: General Provisions\n1.1 Scope\nThese regulations apply to the transport of hazardous materials (HazMat) by road and rail.\n1.2 Classification\nMaterials are classified into 9 classes.\n*   **Class 1:** Explosives\n*   **Class 7:** Radioactive Materials\nSection 2: Specific Requirements for Class 7 (Radioactive)\n2.1 Ambient Conditions\n*   **Temperature:** For Type B(U) packages, the ambient temperature during transport must not\nexceed 38\u00b0C (100\u00b0F) unless the package allows for higher temperatures as specified in its\nCertificate of Compliance.\n*   **Pressure:** The containment system must retain integrity under a reduction of ambient pressure\nto 60 kPa (0.60 bar).\n2.2 Separation Distances\nPackages must be separated from occupied areas by at least:\n*   2 meters for Transport Index (TI) < 1.0\n*   4 meters for TI >= 1.0 and < 5.0\n2.3 Contamination Limits\nNon-fixed contamination on the external surfaces of any package shall not exceed:\n*   4 Bq/cm2 for beta and gamma emitters and low toxicity alpha emitters.\n*   0.4 Bq/cm2 for all other alpha emitters.\nSection 3: Emergency Response\n3.1 Leaking Packages\nIf a package is found to be leaking:\n1.  Isolate the area for at least 50 meters in all directions.\n2.  Notify the Radiation Safety Officer (RSO) immediately.\n3.  Do not touch the package without protective gear.\n3.2 Fire\nIn case of fire involving Class 7 materials:\n*   Use water spray to keep packages cool.\n*   Do not move damaged packages until assessed by an expert.",
+          "generated_code": "result = True\nreason = 'Ambient temperature within limits'"
+        }
+      },
+      "signature_verified": false,
+      "timestamp": 1763978872,
+      "id": "evt_1763978872209"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": true,
+        "reason": "Ambient temperature within limits",
+        "provenance": {
+          "agent_card": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJoYXphcmRzYWZlLWF1dGhvcml0eSIsInN1YiI6IkhhemFyZENvbXBsaWFuY2VBZ2VudCIsImlhdCI6MTc2Mzk3OTgwOCwiZXhwIjoxNzY0MDY2MjA4LCJjYXJkIjp7Im5hbWUiOiJIYXphcmRDb21wbGlhbmNlQWdlbnQiLCJkZXNjcmlwdGlvbiI6IlZhbGlkYXRlcyBIYXpNYXQgdHJhbnNwb3J0IHNjZW5hcmlvcyBhZ2FpbnN0IHJlZ3VsYXRpb25zLiIsImNhcGFiaWxpdGllcyI6WyJDaGVja0hhem1hdFNjZW5hcmlvIl0sInZlcnNpb24iOiIxLjAuMCJ9fQ.8H6XVXBlOQYs38OVn0ERyrWvLC306S30G0nLPtQgdFU",
+          "rag_context": "Hazardous Materials Transport Regulations (Synthetic)\nSection 1: General Provisions\n1.1 Scope\nThese regulations apply to the transport of hazardous materials (HazMat) by road and rail.\n1.2 Classification\nMaterials are classified into 9 classes.\n*   **Class 1:** Explosives\n*   **Class 7:** Radioactive Materials\nSection 2: Specific Requirements for Class 7 (Radioactive)\n2.1 Ambient Conditions\n*   **Temperature:** For Type B(U) packages, the ambient temperature during transport must not\nexceed 38\u00b0C (100\u00b0F) unless the package allows for higher temperatures as specified in its\nCertificate of Compliance.\n*   **Pressure:** The containment system must retain integrity under a reduction of ambient pressure\nto 60 kPa (0.60 bar).\n2.2 Separation Distances\nPackages must be separated from occupied areas by at least:\n*   2 meters for Transport Index (TI) < 1.0\n*   4 meters for TI >= 1.0 and < 5.0\n2.3 Contamination Limits\nNon-fixed contamination on the external surfaces of any package shall not exceed:\n*   4 Bq/cm2 for beta and gamma emitters and low toxicity alpha emitters.\n*   0.4 Bq/cm2 for all other alpha emitters.\nSection 3: Emergency Response\n3.1 Leaking Packages\nIf a package is found to be leaking:\n1.  Isolate the area for at least 50 meters in all directions.\n2.  Notify the Radiation Safety Officer (RSO) immediately.\n3.  Do not touch the package without protective gear.\n3.2 Fire\nIn case of fire involving Class 7 materials:\n*   Use water spray to keep packages cool.\n*   Do not move damaged packages until assessed by an expert.",
+          "generated_code": "result = True\nreason = 'Ambient temperature within limits'"
+        }
+      },
+      "signature_verified": false,
+      "timestamp": 1763979877,
+      "id": "evt_1763979877948"
+    },
+    {
+      "type": "DECISION_MADE",
+      "agent_id": "ComplianceAgent",
+      "payload": {
+        "compliant": true,
+        "reason": "Ambient temperature within limits",
+        "provenance": {
+          "agent_card": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJoYXphcmRzYWZlLWF1dGhvcml0eSIsInN1YiI6IkhhemFyZENvbXBsaWFuY2VBZ2VudCIsImlhdCI6MTc2Mzk3OTkwNCwiZXhwIjoxNzY0MDY2MzA0LCJjYXJkIjp7Im5hbWUiOiJIYXphcmRDb21wbGlhbmNlQWdlbnQiLCJkZXNjcmlwdGlvbiI6IlZhbGlkYXRlcyBIYXpNYXQgdHJhbnNwb3J0IHNjZW5hcmlvcyBhZ2FpbnN0IHJlZ3VsYXRpb25zLiIsImNhcGFiaWxpdGllcyI6WyJDaGVja0hhem1hdFNjZW5hcmlvIl0sInZlcnNpb24iOiIxLjAuMCJ9fQ.AmaCwoZ8NmCbUZm02Q8_zwlXjjh-1Tg9tbY3tQ7yhMM",
+          "rag_context": "Hazardous Materials Transport Regulations (Synthetic)\nSection 1: General Provisions\n1.1 Scope\nThese regulations apply to the transport of hazardous materials (HazMat) by road and rail.\n1.2 Classification\nMaterials are classified into 9 classes.\n*   **Class 1:** Explosives\n*   **Class 7:** Radioactive Materials\nSection 2: Specific Requirements for Class 7 (Radioactive)\n2.1 Ambient Conditions\n*   **Temperature:** For Type B(U) packages, the ambient temperature during transport must not\nexceed 38\u00b0C (100\u00b0F) unless the package allows for higher temperatures as specified in its\nCertificate of Compliance.\n*   **Pressure:** The containment system must retain integrity under a reduction of ambient pressure\nto 60 kPa (0.60 bar).\n2.2 Separation Distances\nPackages must be separated from occupied areas by at least:\n*   2 meters for Transport Index (TI) < 1.0\n*   4 meters for TI >= 1.0 and < 5.0\n2.3 Contamination Limits\nNon-fixed contamination on the external surfaces of any package shall not exceed:\n*   4 Bq/cm2 for beta and gamma emitters and low toxicity alpha emitters.\n*   0.4 Bq/cm2 for all other alpha emitters.\nSection 3: Emergency Response\n3.1 Leaking Packages\nIf a package is found to be leaking:\n1.  Isolate the area for at least 50 meters in all directions.\n2.  Notify the Radiation Safety Officer (RSO) immediately.\n3.  Do not touch the package without protective gear.\n3.2 Fire\nIn case of fire involving Class 7 materials:\n*   Use water spray to keep packages cool.\n*   Do not move damaged packages until assessed by an expert.",
+          "generated_code": "result = True\nreason = 'Ambient temperature within limits'"
+        }
+      },
+      "signature_verified": false,
+      "timestamp": 1763979916,
+      "id": "evt_1763979916612"
+    }
+  ],
+  "workflow_state": [
+    {
+      "scenario_id": "SCN-LANGFLOW-001",
+      "status": "DRAFT",
+      "created_at": 1763978443,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763978443,
+      "id": "evt_1763978443980"
+    },
+    {
+      "workflow_doc_id": "evt_1763978443980",
+      "status": "REJECTED",
+      "timestamp": 1763978449,
+      "metadata": {},
+      "id": "evt_1763978449878"
+    },
+    {
+      "scenario_id": "SCN-LANGFLOW-001",
+      "status": "DRAFT",
+      "created_at": 1763978491,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763978491,
+      "id": "evt_1763978491916"
+    },
+    {
+      "workflow_doc_id": "evt_1763978491916",
+      "status": "APPROVED",
+      "timestamp": 1763978497,
+      "metadata": {},
+      "id": "evt_1763978497006"
+    },
+    {
+      "scenario_id": "SCN-DEMO-2025",
+      "status": "DRAFT",
+      "created_at": 1763978692,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763978692,
+      "id": "evt_1763978692517"
+    },
+    {
+      "workflow_doc_id": "evt_1763978692517",
+      "status": "APPROVED",
+      "timestamp": 1763978700,
+      "metadata": {},
+      "id": "evt_1763978700613"
+    },
+    {
+      "scenario_id": "SCN-DEMO-2025",
+      "status": "DRAFT",
+      "created_at": 1763978779,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763978779,
+      "id": "evt_1763978779283"
+    },
+    {
+      "workflow_doc_id": "evt_1763978779283",
+      "status": "APPROVED",
+      "timestamp": 1763978787,
+      "metadata": {},
+      "id": "evt_1763978787365"
+    },
+    {
+      "scenario_id": "SCN-HITL-001",
+      "status": "DRAFT",
+      "created_at": 1763978866,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763978866,
+      "id": "evt_1763978866179"
+    },
+    {
+      "workflow_doc_id": "evt_1763978866179",
+      "status": "APPROVED",
+      "timestamp": 1763978872,
+      "metadata": {},
+      "id": "evt_1763978872214"
+    },
+    {
+      "scenario_id": "SCN-HITL-001",
+      "status": "DRAFT",
+      "created_at": 1763979807,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763979807,
+      "id": "evt_1763979807311"
+    },
+    {
+      "workflow_doc_id": "evt_1763979807311",
+      "status": "APPROVED",
+      "timestamp": 1763979877,
+      "metadata": {},
+      "id": "evt_1763979877953"
+    },
+    {
+      "scenario_id": "SCN-HITL-001",
+      "status": "DRAFT",
+      "created_at": 1763979903,
+      "history": [],
+      "current_step": "init",
+      "timestamp": 1763979903,
+      "id": "evt_1763979903813"
+    },
+    {
+      "workflow_doc_id": "evt_1763979903813",
+      "status": "APPROVED",
+      "timestamp": 1763979916,
+      "metadata": {},
+      "id": "evt_1763979916621"
+    }
+  ]
+}

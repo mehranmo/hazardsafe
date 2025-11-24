@@ -1,0 +1,55 @@
+{
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "details": [
+    {
+      "scenario_id": "SCN-001-PASS",
+      "name": "Safe Class 7 Transport - Low Temperature",
+      "expected": "compliant",
+      "actual": "compliant",
+      "passed": true,
+      "reason": "Ambient temperature within limits"
+    },
+    {
+      "scenario_id": "SCN-002-FAIL",
+      "name": "High Temperature Violation",
+      "expected": "non-compliant",
+      "actual": "non-compliant",
+      "passed": true,
+      "reason": "Ambient temperature > 38C"
+    },
+    {
+      "scenario_id": "SCN-003-EDGE",
+      "name": "Borderline Temperature",
+      "expected": "compliant",
+      "actual": "compliant",
+      "passed": true,
+      "reason": "Ambient temperature within limits"
+    },
+    {
+      "scenario_id": "SCN-004-EDGE",
+      "name": "Just Over Limit",
+      "expected": "non-compliant",
+      "actual": "non-compliant",
+      "passed": true,
+      "reason": "Ambient temperature > 38C"
+    },
+    {
+      "scenario_id": "SCN-005-PASS",
+      "name": "Cold Storage Transport",
+      "expected": "compliant",
+      "actual": "compliant",
+      "passed": true,
+      "reason": "Ambient temperature within limits"
+    },
+    {
+      "scenario_id": "SCN-006-PASS",
+      "name": "High Transport Index - Safe Temp",
+      "expected": "compliant",
+      "actual": "compliant",
+      "passed": true,
+      "reason": "Ambient temperature within limits"
+    }
+  ]
+}

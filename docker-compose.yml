@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # The HazardSAFE Agentic App
+  hazardsafe-app:
+    build: .
+    container_name: hazardsafe-app
+    volumes:
+      - .:/app
+      - ./data:/app/data # Persist data/chroma_db and mock json
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+    command: python notebook.py # Runs the demo by default
+
+  # LangFlow UI
+  langflow:
+    image: langflowai/langflow:latest
+    container_name: hazardsafe-langflow
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./src/integrations:/app/custom_components # Mount our custom components so they are accessible
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}

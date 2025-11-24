@@ -1,0 +1,175 @@
+{
+    "name": "HazardSAFE HITL Workflow",
+    "description": "Human-in-the-Loop workflow for HazMat compliance validation with Verifiable Credentials",
+    "data": {
+        "nodes": [
+            {
+                "id": "workflow-init",
+                "type": "CustomComponent",
+                "position": {
+                    "x": 100,
+                    "y": 100
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "code": {
+                                "value": "from src.workflow.manager import WorkflowManager\n\nclass WorkflowManagerComponent:\n    def build(self, scenario_id: str) -> str:\n        mgr = WorkflowManager()\n        return mgr.create_workflow(scenario_id)"
+                            }
+                        },
+                        "description": "Initializes a new workflow",
+                        "display_name": "Workflow Init"
+                    }
+                }
+            },
+            {
+                "id": "scenario-input",
+                "type": "ChatInput",
+                "position": {
+                    "x": 100,
+                    "y": 250
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "input_value": {
+                                "value": "{\"id\": \"SCN-001\", \"material_class\": \"Class 7\", \"package_type\": \"Type B(U)\", \"ambient_temperature_c\": 25.0, \"transport_index\": 0.5}"
+                            }
+                        },
+                        "description": "HazMat Scenario JSON Input",
+                        "display_name": "Scenario Input"
+                    }
+                }
+            },
+            {
+                "id": "compliance-agent",
+                "type": "CustomComponent",
+                "position": {
+                    "x": 400,
+                    "y": 175
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "code": {
+                                "value": "from src.agents.compliance_agent import HazardComplianceAgent\nimport json\n\nclass ComplianceAgentComponent:\n    def build(self, scenario_json: str) -> dict:\n        scenario = json.loads(scenario_json) if isinstance(scenario_json, str) else scenario_json\n        agent = HazardComplianceAgent()\n        return agent.check_scenario(scenario)"
+                            }
+                        },
+                        "description": "Checks compliance using RAG + Code-as-Policy",
+                        "display_name": "Compliance Agent"
+                    }
+                }
+            },
+            {
+                "id": "hitl-approval",
+                "type": "ChatInput",
+                "position": {
+                    "x": 700,
+                    "y": 175
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "input_value": {
+                                "value": "**AI Recommendation:** {decision}\n\n**Reason:** {reason}\n\n---\n\n👉 **Do you approve this decision?** (Type 'yes' or 'no')"
+                            }
+                        },
+                        "description": "Human-in-the-Loop Approval Gate",
+                        "display_name": "HITL Approval"
+                    }
+                }
+            },
+            {
+                "id": "provenance-agent",
+                "type": "CustomComponent",
+                "position": {
+                    "x": 1000,
+                    "y": 100
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "code": {
+                                "value": "from src.agents.provenance_agent import HazardProvenanceAgent\n\nclass ProvenanceAgentComponent:\n    def build(self, agent_id: str, event_type: str, payload: dict) -> dict:\n        agent = HazardProvenanceAgent()\n        return agent.log_event(event_type, agent_id, payload)"
+                            }
+                        },
+                        "description": "Logs events to immutable ledger",
+                        "display_name": "Provenance Agent"
+                    }
+                }
+            },
+            {
+                "id": "report-agent",
+                "type": "CustomComponent",
+                "position": {
+                    "x": 1000,
+                    "y": 250
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "code": {
+                                "value": "from src.agents.report_agent import ReportAgent\n\nclass ReportAgentComponent:\n    def build(self, scenario_id: str, decision: dict, evidence_id: str) -> dict:\n        agent = ReportAgent()\n        if decision.get('compliant'):\n            return agent.issue_vc(scenario_id, decision, evidence_id)\n        return {'status': 'skipped', 'reason': 'non-compliant'}"
+                            }
+                        },
+                        "description": "Issues Verifiable Credentials",
+                        "display_name": "Report Agent"
+                    }
+                }
+            },
+            {
+                "id": "output",
+                "type": "ChatOutput",
+                "position": {
+                    "x": 1300,
+                    "y": 175
+                },
+                "data": {
+                    "node": {
+                        "template": {},
+                        "description": "Final Output",
+                        "display_name": "Output"
+                    }
+                }
+            }
+        ],
+        "edges": [
+            {
+                "source": "scenario-input",
+                "target": "compliance-agent",
+                "sourceHandle": "output",
+                "targetHandle": "scenario_json"
+            },
+            {
+                "source": "compliance-agent",
+                "target": "hitl-approval",
+                "sourceHandle": "output",
+                "targetHandle": "decision"
+            },
+            {
+                "source": "hitl-approval",
+                "target": "provenance-agent",
+                "sourceHandle": "approved",
+                "targetHandle": "payload"
+            },
+            {
+                "source": "provenance-agent",
+                "target": "report-agent",
+                "sourceHandle": "output",
+                "targetHandle": "evidence_id"
+            },
+            {
+                "source": "compliance-agent",
+                "target": "report-agent",
+                "sourceHandle": "output",
+                "targetHandle": "decision"
+            },
+            {
+                "source": "report-agent",
+                "target": "output",
+                "sourceHandle": "output",
+                "targetHandle": "input"
+            }
+        ]
+    }
+}
