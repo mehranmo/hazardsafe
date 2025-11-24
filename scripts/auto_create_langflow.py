@@ -14,6 +14,9 @@ FLOW_NAME = "HazardSAFE HITL Workflow"
 flow_data = {
     "name": FLOW_NAME,
     "description": "Human-in-the-Loop workflow for HazMat compliance with Verifiable Credentials",
+    "folder_name": "HazardSAFE",
+    "name": FLOW_NAME,
+    "description": "Human-in-the-Loop workflow for HazMat compliance with Verifiable Credentials",
     "data": {
         "nodes": [
             {
