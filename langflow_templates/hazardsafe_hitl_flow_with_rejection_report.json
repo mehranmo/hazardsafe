@@ -1,0 +1,161 @@
+{
+    "flow": {
+        "name": "HazardSAFE HITL Workflow (With Rejection Reporting)",
+        "description": "HITL approval with provenance logging for both approval and rejection paths.",
+        "nodes": [
+            {
+                "id": "node_1",
+                "type": "ChatInput",
+                "data": {
+                    "label": "Scenario Input",
+                    "value": "{\"id\": \"SCN-DEMO-001\", \"material_class\": \"Class 7\", \"package_type\": \"Type B(U)\", \"ambient_temperature_c\": 25.0, \"transport_index\": 0.5}"
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "id": "node_2",
+                "type": "ComplianceAgent",
+                "data": {
+                    "label": "Compliance Agent"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 0
+                }
+            },
+            {
+                "id": "node_3",
+                "type": "ChatInput",
+                "data": {
+                    "label": "HITL Approval",
+                    "value": "yes"
+                },
+                "position": {
+                    "x": 500,
+                    "y": -100
+                }
+            },
+            {
+                "id": "node_4",
+                "type": "Conditional",
+                "data": {
+                    "label": "Approval Check",
+                    "condition": "{{approval}} == 'yes'"
+                },
+                "position": {
+                    "x": 750,
+                    "y": -50
+                }
+            },
+            {
+                "id": "node_5",
+                "type": "ProvenanceAgent",
+                "data": {
+                    "label": "Provenance (Approved)"
+                },
+                "position": {
+                    "x": 1000,
+                    "y": -150
+                }
+            },
+            {
+                "id": "node_6",
+                "type": "ReportAgent",
+                "data": {
+                    "label": "Report & VC Agent (Approved)"
+                },
+                "position": {
+                    "x": 1250,
+                    "y": -150
+                }
+            },
+            {
+                "id": "node_7",
+                "type": "ChatOutput",
+                "data": {
+                    "label": "Final Output (Approved)"
+                },
+                "position": {
+                    "x": 1500,
+                    "y": -150
+                }
+            },
+            {
+                "id": "node_8",
+                "type": "ProvenanceAgent",
+                "data": {
+                    "label": "Provenance (Rejected)"
+                },
+                "position": {
+                    "x": 1000,
+                    "y": 150
+                }
+            },
+            {
+                "id": "node_9",
+                "type": "ReportAgent",
+                "data": {
+                    "label": "Report & VC Agent (Rejected)"
+                },
+                "position": {
+                    "x": 1250,
+                    "y": 150
+                }
+            },
+            {
+                "id": "node_10",
+                "type": "ChatOutput",
+                "data": {
+                    "label": "Rejection Output"
+                },
+                "position": {
+                    "x": 1500,
+                    "y": 150
+                }
+            }
+        ],
+        "edges": [
+            {
+                "source": "node_1",
+                "target": "node_2"
+            },
+            {
+                "source": "node_2",
+                "target": "node_3"
+            },
+            {
+                "source": "node_3",
+                "target": "node_4"
+            },
+            {
+                "source": "node_4",
+                "target": "node_5",
+                "condition": "true"
+            },
+            {
+                "source": "node_4",
+                "target": "node_8",
+                "condition": "false"
+            },
+            {
+                "source": "node_5",
+                "target": "node_6"
+            },
+            {
+                "source": "node_6",
+                "target": "node_7"
+            },
+            {
+                "source": "node_8",
+                "target": "node_9"
+            },
+            {
+                "source": "node_9",
+                "target": "node_10"
+            }
+        ]
+    }
+}
