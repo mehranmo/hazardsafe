@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HazardSAFE HITL Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ HazardSAFE HITL Dashboard</h1>
+            <p class="subtitle">Human-in-the-Loop Approval System</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('approvals')">📋 Pending Approvals</button>
+            <button class="tab-btn" onclick="showTab('generator')">🧪 Test Generator</button>
+            <button class="tab-btn" onclick="showTab('architecture')">🏗️ Architecture</button>
+            <button class="tab-btn" onclick="showTab('history')">📜 History & Audit</button>
+        </div>
+
+        <!-- Tab: Pending Approvals -->
+        <div id="tab-approvals" class="tab-content active">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <span class="stat-label">Pending Approvals</span>
+                    <span class="stat-value" id="pending-count">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Timeout</span>
+                    <span class="stat-value" id="timeout-hours">-</span>
+                </div>
+            </div>
+
+            <div class="user-info">
+                <label for="user-id">Your ID/Email:</label>
+                <input type="text" id="user-id" placeholder="e.g., alice@hazardsafe.ai" value="reviewer@hazardsafe.ai">
+            </div>
+
+            <div id="workflows-container">
+                <p class="loading">Loading pending workflows...</p>
+            </div>
+        </div>
+
+        <!-- Tab: Test Generator -->
+        <div id="tab-generator" class="tab-content">
+            <div class="generator-section">
+                <h2>🧪 Mock Test Generator</h2>
+                <p>Generate test scenarios to demonstrate the HITL workflow</p>
+
+                <div class="generator-controls">
+                    <div class="control-group">
+                        <label>Scenario Type:</label>
+                        <select id="test-type">
+                            <option value="random">Random</option>
+                            <option value="pass">Pass (Compliant)</option>
+                            <option value="fail">Fail (Non-Compliant)</option>
+                            <option value="edge">Edge Case (At Limit)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-generate" onclick="generateTest()">
+                        ⚡ Generate Test Scenario
+                    </button>
+                </div>
+
+                <div id="generator-result" class="generator-result" style="display: none;">
+                    <h3>Generated Scenario</h3>
+                    <div id="generator-details"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Architecture -->
+        <div id="tab-architecture" class="tab-content">
+            <div class="architecture-section">
+                <h2>🏗️ Workflow Architecture</h2>
+
+                <div class="arch-diagram">
+                    <h3>State Machine</h3>
+                    <div id="state-diagram"></div>
+                </div>
+
+                <div class="arch-agents">
+                    <h3>Agents</h3>
+                    <div id="agents-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: History & Audit -->
+        <div id="tab-history" class="tab-content">
+            <div class="history-section">
+                <h2>📜 Workflow History & Audit Trail</h2>
+                <p>Complete history of all workflows with audit information</p>
+
+                <div class="history-controls">
+                    <button class="btn btn-refresh" onclick="loadHistory()">
+                        🔄 Refresh History
+                    </button>
+                </div>
+
+                <div id="history-container">
+                    <p class="loading">Loading history...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = "{{ api_key }}";
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+
+            // Load data for specific tabs
+            if (tabName === 'architecture') {
+                loadArchitecture();
+            } else if (tabName === 'history') {
+                loadHistory();
+            } else if (tabName === 'approvals') {
+                fetchPending();
+            }
+        }
+
+        // Existing approval functions
+        async function fetchPending() {
+            try {
+                const response = await fetch('/api/pending');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderWorkflows(data.workflows);
+                    document.getElementById('pending-count').textContent = data.count;
+                } else {
+                    showError('Failed to load workflows: ' + data.error);
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('timeout-hours').textContent = data.stats.timeout_hours + 'h';
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        function renderWorkflows(workflows) {
+            const container = document.getElementById('workflows-container');
+
+            if (workflows.length === 0) {
+                container.innerHTML = '<p class="no-workflows">✅ No pending approvals. All caught up!</p>';
+                return;
+            }
+
+            container.innerHTML = workflows.map(wf => `
+                <div class="workflow-card" id="workflow-${wf.id}">
+                    <div class="workflow-header">
+                        <h3>Scenario: ${wf.scenario_id}</h3>
+                        <span class="age-badge">${Math.round(wf.age_hours * 10) / 10}h old</span>
+                    </div>
+                    
+                    <div class="workflow-body">
+                        <div class="section">
+                            <h4>Scenario Data</h4>
+                            <pre>${JSON.stringify(wf.scenario_data, null, 2)}</pre>
+                        </div>
+                        
+                        <div class="section">
+                            <h4>AI Recommendation</h4>
+                            <div class="decision ${wf.decision_data?.compliant ? 'compliant' : 'non-compliant'}">
+                                <strong>Decision:</strong> ${wf.decision_data?.compliant ? '✅ Compliant' : '❌ Non-Compliant'}
+                            </div>
+                            <p><strong>Reason:</strong> ${wf.decision_data?.reason || 'N/A'}</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h4>Your Decision</h4>
+                            <textarea 
+                                id="comments-${wf.id}" 
+                                placeholder="Add your comments (optional)..."
+                                rows="2"
+                            ></textarea>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-approve" onclick="approveWorkflow('${wf.id}')">
+                                    ✅ Approve
+                                </button>
+                                <button class="btn btn-reject" onclick="rejectWorkflow('${wf.id}')">
+                                    ❌ Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function approveWorkflow(workflowId) {
+            const userId = document.getElementById('user-id').value.trim();
+            const comments = document.getElementById(`comments-${workflowId}`).value.trim();
+
+            if (!userId) {
+                alert('Please enter your ID/Email');
+                return;
+            }
+
+            if (!confirm(`Approve workflow ${workflowId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/approve/${workflowId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({ user_id: userId, comments: comments })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(`✅ Approved by ${userId}`);
+                    removeWorkflowCard(workflowId);
+                } else {
+                    showError('Approval failed: ' + data.error);
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+
+        async function rejectWorkflow(workflowId) {
+            const userId = document.getElementById('user-id').value.trim();
+            const comments = document.getElementById(`comments-${workflowId}`).value.trim();
+
+            if (!userId) {
+                alert('Please enter your ID/Email');
+                return;
+            }
+
+            if (!comments) {
+                alert('Please provide a reason for rejection');
+                return;
+            }
+
+            if (!confirm(`Reject workflow ${workflowId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/reject/${workflowId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({ user_id: userId, comments: comments })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(`❌ Rejected by ${userId}`);
+                    removeWorkflowCard(workflowId);
+                } else {
+                    showError('Rejection failed: ' + data.error);
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+
+        function removeWorkflowCard(workflowId) {
+            const card = document.getElementById(`workflow-${workflowId}`);
+            if (card) {
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.remove();
+                    const currentCount = parseInt(document.getElementById('pending-count').textContent);
+                    document.getElementById('pending-count').textContent = Math.max(0, currentCount - 1);
+
+                    const container = document.getElementById('workflows-container');
+                    if (container.children.length === 0) {
+                        container.innerHTML = '<p class="no-workflows">✅ No pending approvals. All caught up!</p>';
+                    }
+                }, 300);
+            }
+        }
+
+        // Test Generator Functions
+        async function generateTest() {
+            const testType = document.getElementById('test-type').value;
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+
+            try {
+                const response = await fetch('/api/generate-test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({ type: testType })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    displayGeneratedTest(data);
+
+                    // Switch to approvals tab to show new workflow
+                    setTimeout(() => {
+                        document.querySelector('[onclick="showTab(\'approvals\')"]').click();
+                    }, 2000);
+                } else {
+                    showError('Generation failed: ' + data.error);
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '⚡ Generate Test Scenario';
+            }
+        }
+
+        function displayGeneratedTest(data) {
+            const resultDiv = document.getElementById('generator-result');
+            const detailsDiv = document.getElementById('generator-details');
+
+            detailsDiv.innerHTML = `
+                <div class="gen-info">
+                    <p><strong>Workflow ID:</strong> ${data.workflow_id}</p>
+                    <p><strong>Scenario ID:</strong> ${data.scenario.id}</p>
+                </div>
+                <div class="gen-scenario">
+                    <h4>Scenario</h4>
+                    <pre>${JSON.stringify(data.scenario, null, 2)}</pre>
+                </div>
+                <div class="gen-decision ${data.decision.compliant ? 'compliant' : 'non-compliant'}">
+                    <h4>AI Decision</h4>
+                    <p><strong>Result:</strong> ${data.decision.compliant ? '✅ Compliant' : '❌ Non-Compliant'}</p>
+                    <p><strong>Reason:</strong> ${data.decision.reason}</p>
+                </div>
+            `;
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Architecture Functions
+        async function loadArchitecture() {
+            try {
+                const response = await fetch('/api/architecture');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderArchitecture(data.architecture);
+                }
+            } catch (error) {
+                console.error('Failed to load architecture:', error);
+            }
+        }
+
+        function renderArchitecture(arch) {
+            // Render state diagram
+            const stateHtml = arch.states.map(state => `
+                <div class="state-node ${state.terminal ? 'terminal' : ''}">
+                    <div class="state-name">${state.name}</div>
+                    <div class="state-desc">${state.description}</div>
+                </div>
+            `).join('');
+
+            const transitionsHtml = arch.transitions.map(t => `
+                <div class="transition">
+                    <span class="from">${t.from}</span>
+                    <span class="arrow">→</span>
+                    <span class="to">${t.to}</span>
+                    <span class="trigger">${t.trigger}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('state-diagram').innerHTML = `
+                <div class="states">${stateHtml}</div>
+                <h4>Transitions</h4>
+                <div class="transitions">${transitionsHtml}</div>
+            `;
+
+            // Render agents
+            const agentsHtml = arch.agents.map(agent => `
+                <div class="agent-card">
+                    <h4>${agent.name}</h4>
+                    <p>${agent.role}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('agents-list').innerHTML = agentsHtml;
+        }
+
+        // History Functions
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderHistory(data.workflows);
+                }
+            } catch (error) {
+                showError('Failed to load history: ' + error.message);
+            }
+        }
+
+        function renderHistory(workflows) {
+            const container = document.getElementById('history-container');
+
+            if (workflows.length === 0) {
+                container.innerHTML = '<p class="no-workflows">No workflow history found.</p>';
+                return;
+            }
+
+            container.innerHTML = workflows.map(wf => {
+                const createdDate = new Date(wf.created_at * 1000).toLocaleString();
+                const statusClass = wf.status.toLowerCase();
+
+                return `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <h3>${wf.scenario_id}</h3>
+                            <span class="status-badge ${statusClass}">${wf.status}</span>
+                        </div>
+                        <div class="history-body">
+                            <p><strong>Workflow ID:</strong> ${wf.id}</p>
+                            <p><strong>Created:</strong> ${createdDate}</p>
+                            ${wf.human_reviewer ? `<p><strong>Reviewer:</strong> ${wf.human_reviewer}</p>` : ''}
+                            ${wf.human_comments ? `<p><strong>Comments:</strong> ${wf.human_comments}</p>` : ''}
+                            ${wf.decision_data?.reason ? `<p><strong>AI Reason:</strong> ${wf.decision_data.reason}</p>` : ''}
+                            
+                            ${wf.history && wf.history.length > 0 ? `
+                                <details>
+                                    <summary>📋 State History (${wf.history.length} transitions)</summary>
+                                    <div class="state-history">
+                                        ${wf.history.map(h => `
+                                            <div class="history-entry">
+                                                <span class="transition">${h.from_status} → ${h.to_status}</span>
+                                                <span class="timestamp">${new Date(h.timestamp * 1000).toLocaleString()}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </details>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Notification Functions
+        function showSuccess(message) {
+            showNotification(message, 'success');
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Auto-refresh pending workflows every 30 seconds
+        setInterval(() => {
+            if (document.getElementById('tab-approvals').classList.contains('active')) {
+                fetchPending();
+            }
+        }, 30000);
+
+        // Initial load
+        fetchPending();
+        fetchStats();
+    </script>
+</body>
+
+</html>

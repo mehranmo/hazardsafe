@@ -73,14 +73,17 @@ class WorkflowManagerComponent(CustomComponent):
             "action": {"display_name": "Action", "options": ["Create", "Update"], "value": "Update"},
             "doc_id": {"display_name": "Document ID (for Update)", "field_type": "str"},
             "status": {"display_name": "New Status", "field_type": "str"},
-            "scenario_id": {"display_name": "Scenario ID (for Create)", "field_type": "str"}
+            "scenario_id": {"display_name": "Scenario ID (for Create)", "field_type": "str"},
+            "metadata": {"display_name": "Metadata (for Update)", "field_type": "dict"}
         }
 
-    def build(self, action: str, doc_id: Optional[str] = None, status: Optional[str] = None, scenario_id: Optional[str] = None) -> str:
+    def build(self, action: str, doc_id: Optional[str] = None, status: Optional[str] = None, 
+              scenario_id: Optional[str] = None, metadata: Optional[Dict] = None) -> str:
         mgr = WorkflowManager()
         if action == "Create":
             return mgr.create_workflow(scenario_id)
         elif action == "Update":
-            mgr.update_status(doc_id, status)
+            mgr.update_status(doc_id, status, metadata)
             return doc_id
         return "Invalid Action"
+

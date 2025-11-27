@@ -6,3 +6,6 @@ python-dotenv
 google-cloud-firestore
 fpdf
 langflow
+langflow
+streamlit
+pyyaml

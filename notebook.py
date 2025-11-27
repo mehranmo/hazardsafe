@@ -59,8 +59,8 @@ def run_demo():
     evidence_id = log_result['doc_id']
     print(f"   -> Event Logged to Immutable Ledger. ID: {evidence_id}")
     time.sleep(1)
-
-    # 5. Report & VC Issuance (Agent 3)
+    
+    # 4. Report & VC Issuance (Agent 3)
     if decision['compliant']:
         print("\n4️⃣  Report Agent: Issuing Verifiable Credential...")
         report_agent = ReportAgentComponent()
@@ -72,13 +72,23 @@ def run_demo():
         print(f"   -> 🏆 VC Issued: {vc['id']}")
         print(f"   -> Issuer: {vc['issuer']}")
         
-        # Final Status Update
-        wf_comp.build(action="Update", doc_id=wf_id, status="APPROVED")
+        # Update workflow: Trigger HITL then auto-approve for demo
+        print("\n5️⃣  Workflow: Auto-approving (demo mode)...")
+        # First transition to PENDING_HITL
+        wf_comp.build(action="Update", doc_id=wf_id, status="PENDING_HITL", 
+                     metadata={"decision_data": decision, "hitl_triggered_at": int(time.time())})
+        # Then approve (simulating human approval)
+        wf_comp.build(action="Update", doc_id=wf_id, status="APPROVED",
+                     metadata={"human_reviewer": "demo-auto-approver", "human_comments": "Auto-approved in demo mode"})
         print("\n✅ Workflow Status: APPROVED")
         
     else:
         print("\n4️⃣  Report Agent: Skipping VC (Non-Compliant).")
-        wf_comp.build(action="Update", doc_id=wf_id, status="REJECTED")
+        # Trigger HITL then auto-reject
+        wf_comp.build(action="Update", doc_id=wf_id, status="PENDING_HITL",
+                     metadata={"decision_data": decision, "hitl_triggered_at": int(time.time())})
+        wf_comp.build(action="Update", doc_id=wf_id, status="REJECTED",
+                     metadata={"human_reviewer": "demo-auto-approver", "human_comments": "Auto-rejected in demo mode"})
         print("\n⛔ Workflow Status: REJECTED")
 
     print("\n✨ Demo Complete!")

@@ -1,0 +1,8 @@
+timeout_hours: 24
+notification_enabled: false  # Future: email/slack notifications
+auto_reject_on_timeout: true
+web_ui:
+  host: "0.0.0.0"
+  port: 5000
+  debug: true
+  api_key: "hazardsafe-demo-key-change-in-production"

@@ -19,6 +19,12 @@ class HazardProvenanceAgent:
         """
         Logs an event to Firestore. 
         Verifies signature if provided (simulating A2A security check).
+        
+        HITL Event Types:
+        - HITL_TRIGGERED: When workflow enters PENDING_HITL
+        - HITL_APPROVED: Human approval with user_id and comments
+        - HITL_REJECTED: Human rejection with user_id and comments  
+        - HITL_TIMEOUT: Auto-rejection due to timeout
         """
         print(f"[{self.agent_name}] Logging event: {event_type} from {agent_id}")
         
@@ -43,6 +49,12 @@ class HazardProvenanceAgent:
             "payload": payload,
             "signature_verified": bool(signature)
         }
+        
+        # Add HITL-specific metadata if applicable
+        if event_type.startswith("HITL_"):
+            event_doc["category"] = "human_in_the_loop"
+            if "user_id" in payload:
+                event_doc["human_actor"] = payload["user_id"]
         
         doc_id = self.db.add_document(event_doc)
         print(f"[{self.agent_name}] Event logged with ID: {doc_id}")

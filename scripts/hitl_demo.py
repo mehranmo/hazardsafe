@@ -3,20 +3,18 @@ import json
 from src.integrations.langflow_components import (
     ComplianceAgentComponent, 
     ProvenanceAgentComponent, 
-    ReportAgentComponent, 
-    WorkflowManagerComponent
+    ReportAgentComponent
 )
+from src.workflow.manager import WorkflowManager
 
 def interactive_hitl_demo():
     print("\n🤖 --- HazardSAFE Human-in-the-Loop (HITL) Demo --- 🤖\n")
     
-    # 1. Setup
-    wf_comp = WorkflowManagerComponent()
+    # Initialize managers
+    wf_manager = WorkflowManager()
     scenario_id = "SCN-HITL-001"
-    print(f"🔹 Initializing Workflow for {scenario_id}...")
-    wf_id = wf_comp.build(action="Create", scenario_id=scenario_id)
     
-    # 2. Input
+    # Define scenario
     scenario = {
         "id": scenario_id,
         "material_class": "Class 7",
@@ -24,54 +22,112 @@ def interactive_hitl_demo():
         "ambient_temperature_c": 25.0,
         "transport_index": 0.5
     }
+    
+    print(f"🔹 Creating workflow for {scenario_id}...")
+    wf_id = wf_manager.create_workflow(scenario_id, scenario_data=scenario)
     print(f"📄 Scenario Data:\n{json.dumps(scenario, indent=2)}\n")
     
-    # 3. AI Analysis
+    # AI Analysis
     print("🕵️  Compliance Agent is analyzing...")
     time.sleep(1)
     comp_agent = ComplianceAgentComponent()
-    # Using gemini-2.0-flash-exp (or mock if key missing)
     decision = comp_agent.build(scenario=scenario, model_name="gemini-2.0-flash-exp")
     
     print(f"\n💡 AI Recommendation: {'✅ APPROVE' if decision['compliant'] else '❌ REJECT'}")
     print(f"   Reason: {decision['reason']}\n")
     
-    # 4. HITL Step
-    print("🛑 [HITL TRIGGER] Human Review Required")
-    user_input = input("👉 Do you authorize this decision? (y/n): ").strip().lower()
+    # Trigger HITL
+    print("🛑 [HITL TRIGGER] Transitioning to PENDING_HITL state...")
+    wf_manager.trigger_hitl(wf_id, decision)
+    
+    # Log HITL trigger to provenance
+    prov_agent = ProvenanceAgentComponent()
+    prov_agent.build(
+        agent_id="WorkflowManager",
+        event_type="HITL_TRIGGERED",
+        payload={
+            "workflow_id": wf_id,
+            "scenario_id": scenario_id,
+            "decision_data": decision
+        }
+    )
+    
+    print(f"\n{'='*60}")
+    print(f"  Workflow ID: {wf_id}")
+    print(f"  Status: PENDING_HITL")
+    print(f"{'='*60}")
+    print(f"\n📋 Next Steps:")
+    print(f"  1. Open the Web UI: http://localhost:5000")
+    print(f"  2. Review the scenario and AI recommendation")
+    print(f"  3. Approve or Reject the workflow")
+    print(f"\n  OR continue with CLI approval below:")
+    print(f"{'='*60}\n")
+    
+    # CLI Option
+    user_input = input("👉 Approve this workflow? (y/n/skip): ").strip().lower()
+    
+    if user_input == 'skip':
+        print("\n⏸️  Workflow paused. Use Web UI to complete approval.")
+        print(f"   Workflow ID: {wf_id}")
+        return
     
     if user_input == 'y':
-        print("\n👤 Human Action: APPROVED")
-        final_status = "APPROVED"
+        user_id = input("👉 Your ID/Email: ").strip() or "cli-user@hazardsafe.ai"
+        comments = input("👉 Comments (optional): ").strip()
         
-        # 5. Execution (Provenance + VC)
-        print("📝 Logging to Provenance Ledger...")
-        prov_agent = ProvenanceAgentComponent()
-        log_result = prov_agent.build(
-            agent_id="ComplianceAgent", 
-            event_type="DECISION_MADE", 
-            payload=decision
+        print(f"\n👤 Approving as {user_id}...")
+        wf_manager.approve_workflow(wf_id, user_id, comments)
+        
+        # Log approval to provenance
+        prov_agent.build(
+            agent_id="CLI",
+            event_type="HITL_APPROVED",
+            payload={
+                "workflow_id": wf_id,
+                "scenario_id": scenario_id,
+                "user_id": user_id,
+                "comments": comments,
+                "decision_data": decision
+            }
         )
-        evidence_id = log_result['doc_id']
         
         if decision['compliant']:
             print("🏆 Issuing Verifiable Credential...")
             report_agent = ReportAgentComponent()
             vc = report_agent.build(
-                scenario_id=scenario_id, 
-                decision=decision, 
-                evidence_id=evidence_id
+                scenario_id=scenario_id,
+                decision=decision,
+                evidence_id=wf_id
             )
             print(f"   -> VC ID: {vc['id']}")
         
+        print("\n✅ Workflow Status: APPROVED")
+        
     else:
-        print("\n👤 Human Action: REJECTED")
-        final_status = "REJECTED"
-        print("🚫 Workflow stopped. No VC issued.")
+        user_id = input("👉 Your ID/Email: ").strip() or "cli-user@hazardsafe.ai"
+        comments = input("👉 Reason for rejection: ").strip() or "Rejected by reviewer"
+        
+        print(f"\n👤 Rejecting as {user_id}...")
+        wf_manager.reject_workflow(wf_id, user_id, comments)
+        
+        # Log rejection to provenance
+        prov_agent.build(
+            agent_id="CLI",
+            event_type="HITL_REJECTED",
+            payload={
+                "workflow_id": wf_id,
+                "scenario_id": scenario_id,
+                "user_id": user_id,
+                "comments": comments,
+                "decision_data": decision
+            }
+        )
+        
+        print("\n⛔ Workflow Status: REJECTED")
+        print("🚫 No VC issued.")
 
-    # 6. Update State
-    wf_comp.build(action="Update", doc_id=wf_id, status=final_status)
-    print(f"\n✅ Workflow Final State: {final_status}")
+    print("\n✨ Demo Complete!")
+    print(f"\n💡 Tip: Check provenance logs to see full audit trail")
 
 if __name__ == "__main__":
     interactive_hitl_demo()
